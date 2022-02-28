@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="2" author="colleen">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fileitem"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fileitem">
+            <column name="id" type="varchar">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar"/>
+            <column name="mimetype" type="varchar"/>
+            <column name="creationdate" type="time"/>
+            <column name="modificationdate" type="time"/>
+            <column name="contentid" type="varchar"/>
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

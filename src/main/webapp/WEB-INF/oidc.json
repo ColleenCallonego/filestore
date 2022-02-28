@@ -1,0 +1,10 @@
+{
+  "realm": "filestore",
+  "auth-server-url": "http://localhost:8080/",
+  "ssl-required": "external",
+  "resource": "filestore",
+  "credentials": {
+    "secret": "Ps8KEed4eXApWi9Fqli57QVLKmshztBJ"
+  },
+  "confidential-port": 0
+}

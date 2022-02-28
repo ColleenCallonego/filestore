@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Bootstrap Admin App + jQuery">
+    <meta name="keywords" content="app, responsive, jquery, bootstrap, dashboard, admin">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>File Store - Drive</title>
+
+    <link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free-webfonts/css/fa-brands.css">
+    <link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free-webfonts/css/fa-regular.css">
+    <link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free-webfonts/css/fa-solid.css">
+    <link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free-webfonts/css/fontawesome.css">
+    <link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="vendor/animate.css/animate.css">
+    <link rel="stylesheet" href="vendor/whirl/dist/whirl.css">
+    <link rel="stylesheet" href="css/bootstrap.css" id="bscss">
+    <link rel="stylesheet" href="css/app.css" id="maincss">
+</head>
+
+<body>
+<div class="wrapper">
+    <header class="topnavbar-wrapper">
+        <nav class="navbar topnavbar">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#/">
+                    <div class="brand-logo">
+                        <img class="img-fluid" src="img/logo.png" alt="FileStore Logo">
+                    </div>
+                    <div class="brand-logo-collapsed">
+                        <img class="img-fluid" src="img/logo-single.png" alt="FileStore Logo">
+                    </div>
+                </a>
+            </div>
+            <ul class="navbar-nav mr-auto flex-row">
+                <li class="nav-item">
+                    <a class="nav-link d-none d-md-block d-lg-block d-xl-block" href="#" data-trigger-resize="" data-toggle-state="aside-collapsed">
+                        <em class="fas fa-bars"></em>
+                    </a>
+                    <a class="nav-link sidebar-toggle d-md-none" href="#" data-toggle-state="aside-toggled" data-no-persist="true">
+                        <em class="fas fa-bars"></em>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <aside class="aside-container">
+        <div class="aside-inner">
+            <nav class="sidebar" data-sidebar-anyclick-close="">
+                <ul class="sidebar-nav">
+                    <li class="has-user-block">
+                        <div class="collapse show" id="user-block">
+                            <div class="item user-block">
+                                <div class="user-block-picture">
+                                    <div class="user-block-status">
+                                        <img class="img-thumbnail rounded-circle" src="img/user/02.jpg" alt="Avatar" width="60" height="60">
+                                        <div class="circle bg-success circle-lg"></div>
+                                    </div>
+                                </div>
+                                <div class="user-block-info">
+                                    <span class="user-block-name">Hello, Mike</span>
+                                    <span class="user-block-role">Designer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class=" active">
+                        <a href="singleview.html" title="Mon Espace">
+                            <em class="far fa-hdd"></em>
+                            <span data-localize="sidebar.nav.SINGLEVIEW">Mon Espace</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="singleview.html" title="Mes Partages">
+                            <em class="far fa-handshake"></em>
+                            <span data-localize="sidebar.nav.SINGLEVIEW">Mes Partages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="singleview.html" title="Mes Partages">
+                            <em class="icon-speedometer"></em>
+                            <span data-localize="sidebar.nav.SINGLEVIEW">Status</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+    <section class="section-container">
+        <div class="content-wrapper">
+            <div class="content-heading">
+                <div>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-secondary" type="button">
+                            <em class="fa fa-home"></em>
+                        </button>
+                        <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#createFolderModal">
+                            <em class="fa fa-folder"></em>
+                        </button>
+                        <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#uploadFileModal">
+                            <em class="fa fa-upload"></em>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-striped w-100" id="filestable">
+                        <thead>
+                        <tr>
+                            <th data-priority="1">Nom</th>
+                            <th>Taille</th>
+                            <th>Type</th>
+                            <th class="sort-numeric">Dernière Modification</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><i class="fa fa-folder mr-2"></i>Trident</td>
+                            <td>Internet Explorer 4.0</td>
+                            <td>Win 95+</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-file mr-2"></i>Trident</td>
+                            <td>Internet Explorer 4.0</td>
+                            <td>Win 95+</td>
+                            <td>4</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div id="createFolderModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <form method="post" action="/api/files" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title align-content-center">Create new Folder</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">Folder name</span>
+                            </div>
+                            <input type="text" id="name" name="name" class="form-control" aria-label="Folder Name" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="uploadFileModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <form method="post" action="/api/files" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Upload file</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="input-group col-md-12">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse… <input type="file" style="display: none;" id="file" name="data">
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" id="filename" name="name" readonly="">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-default" id="upload">Upload</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="vendor/modernizr/modernizr.custom.js"></script>
+<script src="vendor/jquery/dist/jquery.js"></script>
+<script src="vendor/popper.js/dist/umd/popper.js"></script>
+<script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
+<script src="vendor/js-storage/js.storage.js"></script>
+<script src="vendor/jquery.easing/jquery.easing.js"></script>
+<script src="vendor/animo/animo.js"></script>
+<script src="vendor/screenfull/dist/screenfull.js"></script>
+<script src="js/app.js"></script>
+<script>
+    $('#file').change(function() {
+        console.log("called");
+        var filename = $('#file').val().replace(/\\/g, '/').replace(/.*\//, '');
+        console.log(filename);
+        $('#filename').val(filename);
+    });
+</script>
+</body>
+
+</html>

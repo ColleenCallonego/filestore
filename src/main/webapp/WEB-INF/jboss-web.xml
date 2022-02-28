@@ -1,0 +1,3 @@
+<jboss-web xmlns="http://www.jboss.com/xml/ns/javaee" version="8.0">
+    <context-root>/</context-root>
+</jboss-web>
