@@ -19,6 +19,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -113,10 +117,14 @@ public class FilesResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response add(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException {
+    public Response add(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException, IOException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id);
         FileItem item;
         FileItem item2;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        form.getData().transferTo(baos);
+        InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
+        InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
         if ( form.getData() != null ) {
             item = filestore.add(id, form.getName(), form.getData());
             TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
@@ -139,11 +147,15 @@ public class FilesResource {
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response addView(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException {
+    public Response addView(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException, IOException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id + " (html)");
         FileItem item2;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        form.getData().transferTo(baos);
+        InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
+        InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
         if ( form.getData() != null ) {
-            filestore.add(id, form.getName(), form.getData());
+            filestore.add(id, form.getName(), firstClone);
             TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
             List<FileItem> list = result.getResultList();
             if (list.isEmpty()){
@@ -152,7 +164,8 @@ public class FilesResource {
             else{
                 item2 = list.get(0);
             }
-            filestore.add(item2.getId(), form.getName(), form.getData());
+            filestore.add(item2.getId(), form.getName(), secondClone);
+
         } else {
             filestore.add(id, form.getName());
         }
