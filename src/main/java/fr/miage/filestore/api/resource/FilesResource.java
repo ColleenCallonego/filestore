@@ -120,22 +120,13 @@ public class FilesResource {
     public Response add(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException, IOException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id);
         FileItem item;
-        FileItem item2;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        form.getData().transferTo(baos);
-        InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
-        InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
         if ( form.getData() != null ) {
-            item = filestore.add(id, form.getName(), form.getData());
-            TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
-            List<FileItem> list = result.getResultList();
-            if (list.isEmpty()){
-                item2 = filestore.add(id, "Images");
-            }
-            else{
-                item2 = list.get(0);
-            }
-            filestore.add(item2.getId(), form.getName(), form.getData());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            form.getData().transferTo(baos);
+            InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
+            InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
+            item = filestore.add(id, form.getName(), firstClone);
+            createSpecificFolder(item, id, form, secondClone);
         } else {
             item = filestore.add(id, form.getName());
         }
@@ -149,23 +140,14 @@ public class FilesResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addView(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException, IOException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id + " (html)");
-        FileItem item2;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        form.getData().transferTo(baos);
-        InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
-        InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
+        FileItem item;
         if ( form.getData() != null ) {
-            filestore.add(id, form.getName(), firstClone);
-            TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
-            List<FileItem> list = result.getResultList();
-            if (list.isEmpty()){
-                item2 = filestore.add(id, "Images");
-            }
-            else{
-                item2 = list.get(0);
-            }
-            filestore.add(item2.getId(), form.getName(), secondClone);
-
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            form.getData().transferTo(baos);
+            InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
+            InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
+            item = filestore.add(id, form.getName(), firstClone);
+            createSpecificFolder(item, id, form, secondClone);
         } else {
             filestore.add(id, form.getName());
         }
@@ -189,11 +171,51 @@ public class FilesResource {
     @Path("del/{id}/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") String id, @PathParam("name") String name, @Context UriInfo info) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
-        LOGGER.log(Level.INFO, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DELETE /api/files/" + name);
+        LOGGER.log(Level.INFO, "DELETE /api/files/" + name);
         filestore.remove(id, name);
         URI createdUri = info.getBaseUriBuilder().path(FilesResource.class).path(id).path("content").build();
         return Response.seeOther(createdUri).build();
     }
 
-}
+
+    private void createSpecificFolder(FileItem item, String id ,FileUploadForm form, InputStream secondClone) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
+        FileItem item2;
+        String nameSpecificFolder = getNameSpecificFolder(item);
+        TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
+        List<FileItem> list = result.getResultList();
+        if (list.isEmpty()){
+            item2 = filestore.add("42", nameSpecificFolder);
+        }
+        else{
+            item2 = list.get(0);
+        }
+        filestore.add(item2.getId(), form.getName(), secondClone);
+    }
+
+    private String getNameSpecificFolder(FileItem item){
+        String type = item.getMimeType().split("/")[0];
+        switch (type){
+            case "audio":
+                return "AUDIO";
+
+            case "application":
+                return "APPLICATION";
+
+            case "video":
+                return "VIDEO";
+
+            case "font":
+                return "FONT";
+
+            case "image":
+                return "IMAGE";
+
+            case "text":
+                return "TEXT";
+
+            default:
+                return "OTHER";
+        }
+    }
+ }
 
