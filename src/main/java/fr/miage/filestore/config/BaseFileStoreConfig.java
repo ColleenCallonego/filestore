@@ -22,7 +22,7 @@ public class BaseFileStoreConfig implements FileStoreConfig {
     private static final Map<String, String> CONFIG = new HashMap<>();
     static {
         CONFIG.put("home", System.getProperty("user.home") + File.separatorChar + ".filestore");
-        CONFIG.put("owner", "ccallonego");
+        CONFIG.put("owner", "tonka");
         CONFIG.put("consulHttps", "false");
         CONFIG.put("consulHost", "localhost");
         CONFIG.put("consulPort", "8500");
