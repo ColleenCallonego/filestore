@@ -10,6 +10,9 @@ import fr.miage.filestore.file.entity.FileItem;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.ejb.EJB;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -18,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +37,9 @@ public class FilesResource {
 
     @EJB
     private AuthenticationService auth;
+
+    @PersistenceContext(unitName="fsPU")
+    private EntityManager em;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -109,8 +116,18 @@ public class FilesResource {
     public Response add(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id);
         FileItem item;
+        FileItem item2;
         if ( form.getData() != null ) {
             item = filestore.add(id, form.getName(), form.getData());
+            TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
+            List<FileItem> list = result.getResultList();
+            if (list.isEmpty()){
+                item2 = filestore.add(id, "Images");
+            }
+            else{
+                item2 = list.get(0);
+            }
+            filestore.add(item2.getId(), form.getName(), form.getData());
         } else {
             item = filestore.add(id, form.getName());
         }
@@ -124,8 +141,18 @@ public class FilesResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addView(@PathParam("id") String id, @MultipartForm @Valid FileUploadForm form, @Context UriInfo info) throws FileItemAlreadyExistsException, FileServiceException, FileItemNotFoundException {
         LOGGER.log(Level.INFO, "POST /api/files/" + id + " (html)");
+        FileItem item2;
         if ( form.getData() != null ) {
             filestore.add(id, form.getName(), form.getData());
+            TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", "Images");
+            List<FileItem> list = result.getResultList();
+            if (list.isEmpty()){
+                item2 = filestore.add(id, "Images");
+            }
+            else{
+                item2 = list.get(0);
+            }
+            filestore.add(item2.getId(), form.getName(), form.getData());
         } else {
             filestore.add(id, form.getName());
         }
