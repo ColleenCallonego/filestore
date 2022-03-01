@@ -175,10 +175,11 @@ public class FilesResource {
     @GET
     @Path("del/{id}/{name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@PathParam("id") String id, @PathParam("name") String name) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
+    public Response delete(@PathParam("id") String id, @PathParam("name") String name, @Context UriInfo info) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
         LOGGER.log(Level.INFO, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DELETE /api/files/" + name);
         filestore.remove(id, name);
-        return Response.noContent().build();
+        URI createdUri = info.getBaseUriBuilder().path(FilesResource.class).path(id).path("content").build();
+        return Response.seeOther(createdUri).build();
     }
 
 }
