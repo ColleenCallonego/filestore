@@ -113,7 +113,11 @@
                             <td>${item.modificationDate}</td>
                             <td>
                                 <#if !item.isFolder() >
-                                    <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a><a href="/api/files/${item.id}/content"><i class="fas fa-eye"></i></a>
+                                    <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
+                                    <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
+                                    <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
+                                <#else>
+                                    <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
                                 </#if>
                             </td>
                         </tr>

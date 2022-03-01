@@ -172,11 +172,11 @@ public class FilesResource {
     }
 
 
-    @DELETE
-    @Path("{id}/{name}")
+    @GET
+    @Path("del/{id}/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") String id, @PathParam("name") String name) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
-        LOGGER.log(Level.INFO, "DELETE /api/files/" + name);
+        LOGGER.log(Level.INFO, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DELETE /api/files/" + name);
         filestore.remove(id, name);
         return Response.noContent().build();
     }
