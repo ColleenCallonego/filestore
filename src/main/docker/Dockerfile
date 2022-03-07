@@ -12,4 +12,4 @@ USER jboss
 
 EXPOSE 8080
 
-ENTRYPOINT ["/opt/jboss/scripts/entrypoint.sh"]
+ENTRYPOINT ["sh", "/opt/jboss/scripts/entrypoint.sh"]

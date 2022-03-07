@@ -62,16 +62,20 @@
                         </#list>
                     </div>
                 </div>
-                <div class="ml-auto">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#createFolderModal">
-                            <em class="fa fa-folder"></em>
-                        </button>
-                        <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#uploadFileModal">
-                            <em class="fa fa-upload"></em>
-                        </button>
+                <#if (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "AUDIOS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "APPLICATIONS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "VIDEOS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "FONTS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "TEXTS")>
+
+                <#else>
+                    <div class="ml-auto">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#createFolderModal">
+                                <em class="fa fa-folder"></em>
+                            </button>
+                            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#uploadFileModal">
+                                <em class="fa fa-upload"></em>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </#if>
             </div>
             <div class="row">
                 <div class="col-12">

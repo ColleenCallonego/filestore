@@ -184,7 +184,7 @@ public class FilesResource {
         TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
         List<FileItem> list = result.getResultList();
         if (list.isEmpty()){
-            item2 = filestore.add("42", nameSpecificFolder);
+            item2 = filestore.addSpecificTypeFolder("42", nameSpecificFolder);
         }
         else{
             item2 = list.get(0);
@@ -194,28 +194,7 @@ public class FilesResource {
 
     private String getNameSpecificFolder(FileItem item){
         String type = item.getMimeType().split("/")[0];
-        switch (type){
-            case "audio":
-                return "AUDIO";
-
-            case "application":
-                return "APPLICATION";
-
-            case "video":
-                return "VIDEO";
-
-            case "font":
-                return "FONT";
-
-            case "image":
-                return "IMAGE";
-
-            case "text":
-                return "TEXT";
-
-            default:
-                return "OTHER";
-        }
+        return type.toUpperCase() + "S";
     }
  }
 

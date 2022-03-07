@@ -113,6 +113,45 @@ public class FileServiceBean implements FileService {
                 throw new FileServiceException("Item is not a folder, unable to add children");
             }
             LOGGER.log(Level.FINEST, "parent is folder with name: " + parent.getName());
+            ArrayList<String> typeFolderName = new ArrayList<>();
+            typeFolderName.add("AUDIOS");
+            typeFolderName.add("APPLICATIONS");
+            typeFolderName.add("VIDEOS");
+            typeFolderName.add("FONTS");
+            typeFolderName.add("IMAGES");
+            typeFolderName.add("TEXTS");
+            if (id.equals("42") && typeFolderName.contains(name)){
+                throw new FileServiceException("This folder name is forbidden in root, unable to add folder");
+            }
+            TypedQuery<Long> query = em.createNamedQuery("FileItem.countChildrenForName", Long.class).setParameter("parent", parent.getId()).setParameter("name", name);
+            if (query.getSingleResult() > 0) {
+                throw new FileItemAlreadyExistsException("An children with name: " + name + " already exists in item with id: " + id);
+            }
+            FileItem child = new FileItem();
+            child.setId(UUID.randomUUID().toString());
+            child.setParent(parent.getId());
+            child.setName(name);
+            child.setMimeType(FileItem.FOLDER_MIME_TYPE);
+            em.persist(child);
+            parent.setModificationDate(new Date());
+            em.persist(parent);
+            notification.throwEvent("folder.create", child.getId());
+            notification.throwEvent("folder.update", child.getParent());
+            return child;
+        } catch (NotificationServiceException e) {
+            throw new FileServiceException("Unable to add folder", e);
+        }
+    }
+
+    @Override
+    public FileItem addSpecificTypeFolder(String id, String name) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
+        LOGGER.log(Level.FINE, "Adding folder with name: " + name + " to folder: " + id);
+        try {
+            FileItem parent = loadItem(id);
+            if (!parent.isFolder()) {
+                throw new FileServiceException("Item is not a folder, unable to add children");
+            }
+            LOGGER.log(Level.FINEST, "parent is folder with name: " + parent.getName());
             TypedQuery<Long> query = em.createNamedQuery("FileItem.countChildrenForName", Long.class).setParameter("parent", parent.getId()).setParameter("name", name);
             if (query.getSingleResult() > 0) {
                 throw new FileItemAlreadyExistsException("An children with name: " + name + " already exists in item with id: " + id);
