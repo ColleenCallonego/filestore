@@ -15,6 +15,8 @@ public interface FileService {
 
     FileItem add(String id, String name) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException;
 
+    FileItem addSpecificTypeFolder(String id, String name) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException;
+
     FileItem add(String id, String name, InputStream stream) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException;
 
     FileItem get(String id) throws FileServiceException, FileItemNotFoundException;
@@ -24,5 +26,4 @@ public interface FileService {
     void remove(String id, String name) throws FileServiceException, FileItemNotFoundException, FileItemNotEmptyException;
 
     List<FileItem> search(String query) throws FileServiceException;
-
 }

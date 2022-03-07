@@ -184,7 +184,7 @@ public class FilesResource {
         TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
         List<FileItem> list = result.getResultList();
         if (list.isEmpty()){
-            item2 = filestore.add("42", nameSpecificFolder);
+            item2 = filestore.addSpecificTypeFolder("42", nameSpecificFolder);
         }
         else{
             item2 = list.get(0);
