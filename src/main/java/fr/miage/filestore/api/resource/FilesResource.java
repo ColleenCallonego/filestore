@@ -194,28 +194,7 @@ public class FilesResource {
 
     private String getNameSpecificFolder(FileItem item){
         String type = item.getMimeType().split("/")[0];
-        switch (type){
-            case "audio":
-                return "AUDIO";
-
-            case "application":
-                return "APPLICATION";
-
-            case "video":
-                return "VIDEO";
-
-            case "font":
-                return "FONT";
-
-            case "image":
-                return "IMAGE";
-
-            case "text":
-                return "TEXT";
-
-            default:
-                return "OTHER";
-        }
+        return type.toUpperCase() + "S";
     }
  }
 
