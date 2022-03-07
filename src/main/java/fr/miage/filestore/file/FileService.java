@@ -19,6 +19,8 @@ public interface FileService {
 
     FileItem add(String id, String name, InputStream stream) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException;
 
+    FileItem addCopyItem(String id, String name, InputStream secondClone) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException;
+
     FileItem get(String id) throws FileServiceException, FileItemNotFoundException;
 
     InputStream getContent(String id) throws FileServiceException, FileItemNotFoundException;

@@ -189,7 +189,7 @@ public class FilesResource {
         else{
             item2 = list.get(0);
         }
-        filestore.add(item2.getId(), form.getName(), secondClone);
+        filestore.addCopyItem(item2.getId(), form.getName(), secondClone);
     }
 
     private String getNameSpecificFolder(FileItem item){

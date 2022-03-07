@@ -123,6 +123,9 @@ public class FileServiceBean implements FileService {
             if (id.equals("42") && typeFolderName.contains(name)){
                 throw new FileServiceException("This folder name is forbidden in root, unable to add folder");
             }
+            if (typeFolderName.contains(parent.getName())){
+                throw new FileServiceException("this special file type folder is protected, unable to add folder");
+            }
             TypedQuery<Long> query = em.createNamedQuery("FileItem.countChildrenForName", Long.class).setParameter("parent", parent.getId()).setParameter("name", name);
             if (query.getSingleResult() > 0) {
                 throw new FileItemAlreadyExistsException("An children with name: " + name + " already exists in item with id: " + id);
@@ -176,6 +179,51 @@ public class FileServiceBean implements FileService {
     @Metrics(key = "upload", type = Metrics.Type.INCREMENT)
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public FileItem add(String id, String name, InputStream stream) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
+        LOGGER.log(Level.FINE, "Adding file with name: " + name + " to folder: " + id);
+        try {
+            FileItem parent = loadItem(id);
+            if ( !parent.isFolder() ) {
+                throw new FileServiceException("Item is not a folder, unable to add children");
+            }
+            LOGGER.log(Level.FINEST, "parent is folder with name: " + parent.getName());
+            ArrayList<String> typeFolderName = new ArrayList<>();
+            typeFolderName.add("AUDIOS");
+            typeFolderName.add("APPLICATIONS");
+            typeFolderName.add("VIDEOS");
+            typeFolderName.add("FONTS");
+            typeFolderName.add("IMAGES");
+            typeFolderName.add("TEXTS");
+            if (typeFolderName.contains(parent.getName())){
+                throw new FileServiceException("this special file type folder is protected, unable to upload item");
+            }
+            TypedQuery<Long> query = em.createNamedQuery("FileItem.countChildrenForName", Long.class).setParameter("parent", parent.getId()).setParameter("name", name);
+            if ( query.getSingleResult() > 0 ) {
+                throw new FileItemAlreadyExistsException("An children with name: " + name + " already exists in item with id: " + id);
+            }
+            String contentId = store.put(stream);
+            stream.close();
+            long size = store.size(contentId);
+            String type = store.type(contentId, name);
+            FileItem child = new FileItem();
+            child.setId(UUID.randomUUID().toString());
+            child.setParent(parent.getId());
+            child.setName(name);
+            child.setMimeType(type);
+            child.setSize(size);
+            child.setContentId(contentId);
+            em.persist(child);
+            parent.setModificationDate(new Date());
+            em.persist(parent);
+            notification.throwEvent("file.create", child.getId());
+            notification.throwEvent("folder.update", child.getParent());
+            return child;
+        } catch (BinaryStoreServiceException | BinaryStreamNotFoundException | IOException | NotificationServiceException e ) {
+            throw new FileServiceException("Unable to find binary stream for item", e);
+        }
+    }
+
+    @Override
+    public FileItem addCopyItem(String id, String name, InputStream stream) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
         LOGGER.log(Level.FINE, "Adding file with name: " + name + " to folder: " + id);
         try {
             FileItem parent = loadItem(id);
