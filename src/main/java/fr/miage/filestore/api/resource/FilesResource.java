@@ -126,7 +126,7 @@ public class FilesResource {
             InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
             InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
             item = filestore.add(id, form.getName(), firstClone);
-            createSpecificFolder(item, id, form, secondClone);
+            createSpecificFolder(item, form, secondClone);
         } else {
             item = filestore.add(id, form.getName());
         }
@@ -147,7 +147,7 @@ public class FilesResource {
             InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
             InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
             item = filestore.add(id, form.getName(), firstClone);
-            createSpecificFolder(item, id, form, secondClone);
+            createSpecificFolder(item, form, secondClone);
         } else {
             filestore.add(id, form.getName());
         }
@@ -172,13 +172,25 @@ public class FilesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") String id, @PathParam("name") String name, @Context UriInfo info) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
         LOGGER.log(Level.INFO, "DELETE /api/files/" + name);
-        filestore.remove(id, name);
+        removeCopyFile(id, name);
         URI createdUri = info.getBaseUriBuilder().path(FilesResource.class).path(id).path("content").build();
         return Response.seeOther(createdUri).build();
     }
 
+    private void removeCopyFile(String id, String name) throws FileItemNotFoundException, FileServiceException, FileItemNotEmptyException {
+        TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", name);
+        List<FileItem> list = result.getResultList();
+        FileItem item = list.get(0);
+        String nameSpecificFolder = getNameSpecificFolder(item);
+        TypedQuery<FileItem> result2 = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
+        List<FileItem> list2 = result2.getResultList();
+        FileItem item2 = list2.get(0);
 
-    private void createSpecificFolder(FileItem item, String id ,FileUploadForm form, InputStream secondClone) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
+        filestore.remove(id, name);//remove original
+        filestore.removeCopy(item2.getId(), item.getName());//remove copy
+    }
+
+    private void createSpecificFolder(FileItem item,FileUploadForm form, InputStream secondClone) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
         FileItem item2;
         String nameSpecificFolder = getNameSpecificFolder(item);
         TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);

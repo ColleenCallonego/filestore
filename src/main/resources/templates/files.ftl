@@ -63,7 +63,7 @@
                         </#list>
                     </div>
                 </div>
-                <#if (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "AUDIOS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "APPLICATIONS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "VIDEOS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "FONTS") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "TEXTS")>
+                <#if (content.parent.parent?? && content.parent.parent == "42" && (content.parent.name = "AUDIOS" || content.parent.name = "APPLICATIONS" || content.parent.name = "VIDEOS" || content.parent.name = "FONTS" || content.parent.name = "IMAGES" || content.parent.name = "TEXTS"))>
 
                 <#else>
                     <div class="ml-auto">
@@ -80,7 +80,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <#if (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "VIDEOS")>
+                    <#if (content.parent.parent?? && content.parent.parent == "42" && (content.parent.name = "IMAGES" || content.parent.name = "VIDEOS"))>
                         <#list content.items as item>
                             <div style="display: inline-block">
                                 <div class="container">
@@ -92,7 +92,6 @@
                                     <div class="overlay">
                                         <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
                                         <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
-                                        <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +137,11 @@
                                 <#if !item.isFolder() >
                                     <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
                                     <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
-                                    <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
+                                    <#if (content.parent.parent?? && content.parent.parent == "42" && (content.parent.name = "AUDIOS" || content.parent.name = "APPLICATIONS" || content.parent.name = "FONTS" || content.parent.name = "TEXTS")) >
+
+                                    <#else>
+                                        <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
+                                    </#if>
                                 <#else>
                                     <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
                                 </#if>

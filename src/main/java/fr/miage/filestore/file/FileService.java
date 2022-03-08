@@ -27,5 +27,7 @@ public interface FileService {
 
     void remove(String id, String name) throws FileServiceException, FileItemNotFoundException, FileItemNotEmptyException;
 
+    void removeCopy(String id, String name) throws FileServiceException, FileItemNotFoundException, FileItemNotEmptyException;
+
     List<FileItem> search(String query) throws FileServiceException;
 }

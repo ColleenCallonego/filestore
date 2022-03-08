@@ -293,6 +293,58 @@ public class FileServiceBean implements FileService {
             }
             LOGGER.log(Level.FINEST, "parent is folder with name: " + parent.getName());
             TypedQuery<FileItem> query = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", parent.getId()).setParameter("name", name).setMaxResults(1);
+            ArrayList<String> typeFolderName = new ArrayList<>();
+            typeFolderName.add("AUDIOS");
+            typeFolderName.add("APPLICATIONS");
+            typeFolderName.add("VIDEOS");
+            typeFolderName.add("FONTS");
+            typeFolderName.add("IMAGES");
+            typeFolderName.add("TEXTS");
+            if (typeFolderName.contains(parent.getName())){
+                throw new FileServiceException("this special file type folder is protected, unable to remove file in");
+            }
+            FileItem children;
+            try {
+                children = query.getSingleResult();
+            } catch (NoResultException e) {
+                throw new FileItemNotFoundException("No children found with name: " + name + " in parent item with id: " + id);
+            }
+            LOGGER.log(Level.FINEST, "children has name: " + children.getName());
+            if ( children.isFolder() ) {
+                LOGGER.log(Level.FINEST, "children is folder, checking if empty");
+                Long folderSize = em.createNamedQuery("FileItem.countChildren", Long.class).setParameter("parent", children.getId()).getSingleResult();
+                if ( folderSize > 0 ) {
+                    throw new FileItemNotEmptyException("Children is a folder and is not empty, unable to remove, purge before");
+                }
+            }
+            parent.setModificationDate(new Date());
+            em.persist(parent);
+            String eventType = "folder.remove";
+            if ( !children.isFolder() ) {
+                LOGGER.log(Level.FINEST, "children is file, deleting content also");
+                store.delete(children.getContentId());
+                eventType = "file.remove";
+            }
+            em.remove(children);
+            notification.throwEvent(eventType, children.getId());
+            notification.throwEvent("folder.update", children.getParent());
+        } catch (BinaryStoreServiceException | BinaryStreamNotFoundException | NotificationServiceException e ) {
+            throw new FileServiceException("Unable to find binary stream for item", e);
+        }
+    }
+
+    @Override
+    @Metrics(key = "deleteCopy", type = Metrics.Type.INCREMENT)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void removeCopy(String id, String name) throws FileServiceException, FileItemNotFoundException, FileItemNotEmptyException {
+        LOGGER.log(Level.FINE, "Removing item with name: " + name + " from folder: " + id);
+        try {
+            FileItem parent = loadItem(id);
+            if ( !parent.isFolder() ) {
+                throw new FileServiceException("Item is not a folder, unable to remove children");
+            }
+            LOGGER.log(Level.FINEST, "parent is folder with name: " + parent.getName());
+            TypedQuery<FileItem> query = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", parent.getId()).setParameter("name", name).setMaxResults(1);
             FileItem children;
             try {
                 children = query.getSingleResult();
