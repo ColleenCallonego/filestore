@@ -16,7 +16,8 @@
     <link rel="stylesheet" href="/vendor/animate.css/animate.css">
     <link rel="stylesheet" href="/vendor/whirl/dist/whirl.css">
     <link rel="stylesheet" href="/css/bootstrap.css" id="bscss">
-    <link rel="stylesheet" href="/css/app.css" id="maincss">ft
+    <link rel="stylesheet" href="/css/app.css" id="maincss">
+    <link rel="stylesheet" href="/css/preview.css" id="preview">
 </head>
 
 <body>
@@ -81,12 +82,14 @@
                 <div class="col-12">
                     <#if content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES">
                         <#list content.items as item>
-                            <div class="container">
-                                <img height="200px" src="/api/files/${item.id}/content" alt="${item.id}">
-                                <div height="200px" style="position: absolute; bottom: 0; background: rgb(0, 0, 0); background: rgba(0, 0, 0, 0.5); width: 100%; transition: .5s ease; opacity:0; padding: 20px;" class="overlay">
-                                    <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
-                                    <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
-                                    <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
+                            <div style="display: inline-block">
+                                <div class="container">
+                                    <img class="imageItem" src="/api/files/${item.id}/content" alt="${item.id}">
+                                    <div class="overlay">
+                                        <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
+                                        <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
+                                        <a href="/api/files/del/${item.parent}/${item.name}"><i class="fa fa-trash"></i></a>
+                                    </div>
                                 </div>
                             </div>
                         </#list>
@@ -225,9 +228,7 @@
     }
 </script>
 <style>
-    .container:hover .overlay {
-        opacity: 1;
-    }
+
 </style>
 </body>
 </html>
