@@ -80,11 +80,15 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <#if content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES">
+                    <#if (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "IMAGES") || (content.parent.parent?? && content.parent.parent == "42" && content.parent.name = "VIDEOS")>
                         <#list content.items as item>
                             <div style="display: inline-block">
                                 <div class="container">
-                                    <img class="imageItem" src="/api/files/${item.id}/content" alt="${item.id}">
+                                    <#if content.parent.name = "VIDEOS">
+                                        <video class="imageItem" src="/api/files/${item.id}/content" alt="${item.id}"></video>
+                                    <#else>
+                                        <img class="imageItem" src="/api/files/${item.id}/content" alt="${item.id}">
+                                    </#if>
                                     <div class="overlay">
                                         <a href="/api/files/${item.id}/content?download=true" class="mr-3"><i class="fas fa-download"></i></a>
                                         <a href="/api/files/${item.id}/content" class="mr-3"><i class="fas fa-eye"></i></a>
