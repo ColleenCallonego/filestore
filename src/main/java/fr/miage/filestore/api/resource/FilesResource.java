@@ -181,13 +181,21 @@ public class FilesResource {
         TypedQuery<FileItem> result = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", id).setParameter("name", name);
         List<FileItem> list = result.getResultList();
         FileItem item = list.get(0);
-        String nameSpecificFolder = getNameSpecificFolder(item);
-        TypedQuery<FileItem> result2 = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
-        List<FileItem> list2 = result2.getResultList();
-        FileItem item2 = list2.get(0);
+        TypedQuery<FileItem> result2;
+        List<FileItem> list2;
+        FileItem item2 = null;
+        if (!item.isFolder()){
+            String nameSpecificFolder = getNameSpecificFolder(item);
+            result2 = em.createNamedQuery("FileItem.findChildrenForName", FileItem.class).setParameter("parent", "42").setParameter("name", nameSpecificFolder);
+            list2 = result2.getResultList();
+            item2 = list2.get(0);
+        }
 
         filestore.remove(id, name);//remove original
-        filestore.removeCopy(item2.getId(), item.getName());//remove copy
+        if (!item.isFolder()){
+            filestore.removeCopy(item2.getId(), item.getName());//remove copy
+        }
+
     }
 
     private void createSpecificFolder(FileItem item,FileUploadForm form, InputStream secondClone) throws FileServiceException, FileItemAlreadyExistsException, FileItemNotFoundException {
