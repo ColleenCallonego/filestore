@@ -257,7 +257,7 @@
         <artifactId>dockerfile-maven-plugin</artifactId>
         <version>1.4.13</version>
         <configuration>
-          <repository>tonka/filestore</repository>
+          <repository>themis/filestore</repository>
           <tag>${project.version}</tag>
           <contextDirectory>${project.build.directory}</contextDirectory>
           <dockerfile>${project.build.directory}/Dockerfile</dockerfile>
