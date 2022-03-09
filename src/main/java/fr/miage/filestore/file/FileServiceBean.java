@@ -84,7 +84,12 @@ public class FileServiceBean implements FileService {
         TypedQuery<FileItem> query = em.createNamedQuery("FileItem.listChildren", FileItem.class).setParameter("parent", item.getId());
         List<FileItem> items = query.getResultList();
         LOGGER.log(Level.FINEST, "query returned " + items.size() + " results");
-        items.sort(new FileItem.NameComparatorAsc());
+        if (item.getName().equals("IMAGES") || item.getName().equals("VIDEOS")){
+            items.sort(new FileItem.DateCompatatorDesc());
+        }
+        else {
+            items.sort(new FileItem.NameComparatorAsc());
+        }
         return items;
     }
 

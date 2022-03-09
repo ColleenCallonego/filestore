@@ -163,6 +163,18 @@ public class FileItem implements Serializable {
             return o1.getName().compareTo(o2.getName());
         }
     }
+    public static class DateCompatatorDesc implements Comparator<FileItem> {
+        @Override
+        public int compare(FileItem o1, FileItem o2) {
+            if ( o1.isFolder() && !o2.isFolder() ) {
+                return -1;
+            }
+            if ( !o1.isFolder() && o2.isFolder() ) {
+                return 1;
+            }
+            return o2.getCreationDate().compareTo(o1.getCreationDate());
+        }
+    }
 
     public static class NameComparatorDesc implements Comparator<FileItem> {
         @Override
